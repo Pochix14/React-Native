@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Image, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Pressable} from 'react-native';
 
 import globalStyles from '../styles';
 import {formatearCantidad} from '../helpers';
 import CircularProgress from 'react-native-circular-progress-indicator';
 
-const ControlPresupuesto = ({presupuesto, gastos}) => {
+const ControlPresupuesto = ({presupuesto, gastos, resetApp}) => {
   const [disponible, setDisponible] = useState(0);
   const [gastado, setGastado] = useState(0);
   const [porcentaje, setPorcentaje] = useState(0);
@@ -52,6 +52,10 @@ const ControlPresupuesto = ({presupuesto, gastos}) => {
       </View>
 
       <View style={styles.contenedorTexto}>
+        <Pressable style={styles.boton} onPress={resetApp}>
+          <Text style={styles.txtBoton}>Reiniciar App</Text>
+        </Pressable>
+
         <Text style={styles.valor}>
           <Text style={styles.label}>Presupuesto: </Text>
           {formatearCantidad(presupuesto)}
@@ -78,10 +82,6 @@ const styles = StyleSheet.create({
   centrarGrafica: {
     alignItems: 'center',
   },
-  imagen: {
-    width: 250,
-    height: 250,
-  },
   contenedorTexto: {
     marginTop: 50,
   },
@@ -93,6 +93,18 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '700',
     color: '#3B82F6',
+  },
+  boton: {
+    backgroundColor: '#DB2777',
+    padding: 10,
+    marginBottom: 40,
+    borderRadius: 10,
+  },
+  txtBoton: {
+    textAlign: 'center',
+    color: '#FFF',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
 });
 

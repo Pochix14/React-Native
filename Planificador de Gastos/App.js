@@ -1,9 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   Alert,
   Pressable,
@@ -29,16 +27,73 @@ const App = () => {
   const [filtro, setFiltro] = useState('');
   const [gastosFiltrados, setGastosFiltrados] = useState([]);
 
+  // Use effect que busca en memoria si se guardo algun presupuesto y si este es valido, carga el modal
   useEffect(() => {
-    const almacenar = async () => {
-      const name = 'Pablo';
-      await AsyncStorage.setItem('prueba1', name);
+    const obtenerPresupuesto = async () => {
+      try {
+        // Funcion que pregunta si existe en memoria el item, en caso de NO, asigna 0
+        const presupuestoGuardado =
+          (await AsyncStorage.getItem('planificador_presupuesto')) ?? 0;
 
-      console.log('Almacenado');
+        // Condicional que valida si el presupuesto es valido para mostrar el modal con el presupuesto guardado
+        if (presupuestoGuardado > 0) {
+          setPresupuesto(presupuestoGuardado);
+          setIsValidPresupuesto(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     };
-    almacenar();
+    obtenerPresupuesto();
   }, []);
 
+  // UseEffect que busca en memoria si se guardaron los gastos, en caso contrario asigna arreglo vacio
+  useEffect(() => {
+    const obtenerGastos = async () => {
+      try {
+        const gastosGuardados = await AsyncStorage.getItem(
+          'planificador_gastos',
+        );
+
+        setGastos(gastosGuardados ? JSON.parse(gastosGuardados) : []);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    obtenerGastos();
+  }, []);
+
+  // UseEffect para guardar el presupuesto en memoria, con el uso de un async await
+  // Este se activa si hay presupuesto valido y cada vez que cambie este
+  useEffect(() => {
+    if (isValidPresupuesto) {
+      const guardarPresupuesto = async () => {
+        try {
+          await AsyncStorage.setItem('planificador_presupuesto', presupuesto);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      guardarPresupuesto();
+    }
+  }, [isValidPresupuesto]);
+
+  // Useeffect que guarda los gastos en memoria
+  useEffect(() => {
+    const guardargastos = async () => {
+      try {
+        await AsyncStorage.setItem(
+          'planificador_gastos',
+          JSON.stringify(gastos), // Se utiliza JSON.stringify para convertir a string ya que solo asi se guardan datos
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    guardargastos();
+  }, [gastos]);
+
+  // Funciona que validad el presupuesto ingresado, debe ser numero y mayor a 0
   const handleNuevoPresupuesto = presupuesto => {
     if (Number(presupuesto) > 0) {
       setIsValidPresupuesto(true);
@@ -49,6 +104,7 @@ const App = () => {
     }
   };
 
+  // Funcion que valida que al crear un nuevo gasto, se llenen los campos
   const handleGasto = gasto => {
     if ([gasto.nombre, gasto.categoria, gasto.cantidad].includes('')) {
       Alert.alert('Error', 'Todos los campos son obligatorios', [
@@ -75,6 +131,7 @@ const App = () => {
     setModal(!modal);
   };
 
+  // Funcion que elimina un gasto del arreglo, muestra un alert
   const eliminarGasto = id => {
     Alert.alert(
       'Desea eliminar el gasto?',
@@ -97,6 +154,34 @@ const App = () => {
     );
   };
 
+  // Funcion que reinicia la app
+  const resetApp = () => {
+    Alert.alert(
+      'Deseas resetear la app?',
+      'Esto eliminara los datos almacenados',
+      [
+        {text: 'No', style: 'cancel'},
+        {
+          text: 'Resetear',
+          style: 'destructive',
+          // Si se presiona en resetear
+          onPress: async () => {
+            try {
+              // Limpia memoria
+              await AsyncStorage.clear();
+              // Setea los states en el estado inicial, con esto se muestra la primer pantalla
+              setIsValidPresupuesto(false);
+              setPresupuesto(0);
+              setGastos([]);
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.contenedor}>
       <ScrollView>
@@ -104,7 +189,11 @@ const App = () => {
           <Header />
 
           {isValidPresupuesto ? (
-            <ControlPresupuesto presupuesto={presupuesto} gastos={gastos} />
+            <ControlPresupuesto
+              presupuesto={presupuesto}
+              gastos={gastos}
+              resetApp={resetApp}
+            />
           ) : (
             <NuevoPresupuesto
               handleNuevoPresupuesto={handleNuevoPresupuesto}
