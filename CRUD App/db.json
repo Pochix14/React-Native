@@ -1,0 +1,39 @@
+{
+  "clientes": [
+    {
+      "nombre": "Pablo",
+      "telefono": "852000",
+      "correo": "asdasd",
+      "empresa": "hffgh",
+      "id": 1
+    },
+    {
+      "nombre": "Kawi",
+      "telefono": "02655",
+      "correo": "yrtgfd",
+      "empresa": "fgnfgn",
+      "id": 2
+    },
+    {
+      "nombre": "Chimbita",
+      "telefono": "8545665",
+      "correo": "sdfsdjkg",
+      "empresa": "sdfgsdf",
+      "id": 3
+    },
+    {
+      "nombre": "Carmela",
+      "telefono": "2342",
+      "correo": "sdfsdf",
+      "empresa": "dfgdfgdfgdg",
+      "id": 4
+    },
+    {
+      "nombre": "Pillo",
+      "telefono": "5545",
+      "correo": "dfgdgd",
+      "empresa": "ergeg",
+      "id": 5
+    }
+  ]
+}
